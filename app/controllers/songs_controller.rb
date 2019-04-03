@@ -18,13 +18,13 @@ class SongsController < ApplicationController
 
   # POST: /songs
   post "/songs" do
-    @song = Song.create(name: params["Name"])
-    @song.artist = Artist.find_or_create_by(name: params["Artist Name"])
+    @song = Song.new(name: params["Name"])
+    @song.artist = Artist.find_or_create_by(:name => params["Artist Name"])
     @song.genre_ids = params[:genres]
     @song.save
-    puts 'this is working'
+
     flash[:message] = "Successfully created song."
-    redirect to("/songs/#{@song.slug}")
+    redirect "/songs/#{@song.slug}"
   end
 
   # GET: /songs/5
@@ -35,13 +35,21 @@ class SongsController < ApplicationController
   end
 
   # GET: /songs/5/edit
-  get "/songs/:id/edit" do
+  get "/songs/:slug/edit" do
+    @song = Song.find_by_slug(params[:slug])
     erb :"/songs/edit.html"
   end
 
   # PATCH: /songs/5
-  patch "/songs/:id" do
-    redirect "/songs/:id"
+  patch "/songs/:slug" do
+    @song = Song.find_by_slug(params[:slug])
+    @song.update(params[:song])
+    @song.artist = Artist.find_or_create_by(name: params[:artist][:name])
+    @song.genre_ids = params[:genres]
+    @song.save
+
+    flash[:message] = "Successfully updated song."
+    redirect "/songs/#{@song.slug}"
   end
 
   # DELETE: /songs/5/delete

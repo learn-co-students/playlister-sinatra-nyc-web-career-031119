@@ -9,6 +9,6 @@ class ApplicationController < Sinatra::Base
   use Rack::Flash
 
   get '/' do
-    erb :index
+    redirect '/songs'
   end
 end
